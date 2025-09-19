@@ -7,6 +7,7 @@
 
 # ros2_rm_robot
 
+from https://github.com/RealManRobot/ros2_rm_robot.git 
 The package is mainly used for providing ROS2 support for the robotic arm, and the following is the use environment.
 
 * Currently supported robotic arms are RM65 series, RM75 series, ECO65 series, ECO63 series, RML63 series, GEN72 series, and the details can be referred to the website [RealMan robots](http://www.realman-robotics.com/).
