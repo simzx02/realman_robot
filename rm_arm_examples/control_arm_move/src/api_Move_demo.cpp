@@ -37,7 +37,7 @@ class MoveDemoPub: public rclcpp::Node
     rclcpp::Publisher<rm_ros_interfaces::msg::Movec>::SharedPtr movec_publisher_; 
     rclcpp::TimerBase::SharedPtr loop_pub_Timer;                                           //定时发布器
     rm_ros_interfaces::msg::Movej movej_way;
-    int arm_dof_ = 6;
+    int arm_dof_ = 7;
 };
 
 /****************************************创建类************************************/ 
@@ -129,7 +129,7 @@ void MoveDemoPub::looppub_timer_callback()
       movej_way.joint[3] = -0.000454;
       movej_way.joint[4] = 1.221748;
       movej_way.joint[5] = 0.000052;
-      movej_way.speed = 20;
+      movej_way.speed = 5;
       movej_way.dof = 6;
     }
     if(arm_dof_ == 7)
@@ -141,7 +141,7 @@ void MoveDemoPub::looppub_timer_callback()
       movej_way.joint[4] = 0.00873;
       movej_way.joint[5] = 0.3595;
       movej_way.joint[6] = 0.3595;
-      movej_way.speed = 20;
+      movej_way.speed = 5;
       movej_way.dof = 7;
     }
     movej_way.block = true;
@@ -160,7 +160,7 @@ void MoveDemoPub::looppub_timer_callback()
     moveJ_P_TargetPose.pose.orientation.y = -0.094604;
     moveJ_P_TargetPose.pose.orientation.z = -0.025721;
     moveJ_P_TargetPose.pose.orientation.w = 0.002349;
-    moveJ_P_TargetPose.speed = 20;
+    moveJ_P_TargetPose.speed = 5;
     moveJ_P_TargetPose.block = true;
     this->movej_p_publisher_->publish(moveJ_P_TargetPose);
     movej_state = false;
@@ -177,7 +177,7 @@ void MoveDemoPub::looppub_timer_callback()
   moveL_TargetPose.pose.orientation.y = -0.094604;
   moveL_TargetPose.pose.orientation.z = -0.025721;
   moveL_TargetPose.pose.orientation.w = 0.002349;
-  moveL_TargetPose.speed = 20;
+  moveL_TargetPose.speed = 5;
   moveL_TargetPose.block = true;
   this->movel_publisher_->publish(moveL_TargetPose);
   movej_p_state = false;
@@ -201,7 +201,7 @@ void MoveDemoPub::looppub_timer_callback()
   moveC_TargetPose.pose_end.orientation.y = -0.094604;
   moveC_TargetPose.pose_end.orientation.z = -0.025721;
   moveC_TargetPose.pose_end.orientation.w = 0.002349;
-  moveC_TargetPose.speed = 20;
+  moveC_TargetPose.speed = 5;
   moveC_TargetPose.loop = 1;
   moveC_TargetPose.trajectory_connect = 0;
   moveC_TargetPose.block = true;

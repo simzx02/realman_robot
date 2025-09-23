@@ -20,8 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'robot_mover = my_ros_pkg.robot_mover:main',
-            'ordered_robot_mover = my_ros_pkg.ordered_robot_mover:main'
+            'move_circle = my_ros_pkg.robot_mover:main',
+            'circular = my_ros_pkg.circular:main',
+            'move_j = my_ros_pkg.move_j:main'
         ],
     },
 )
