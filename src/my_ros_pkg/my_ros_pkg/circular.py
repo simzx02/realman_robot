@@ -7,9 +7,9 @@ from geometry_msgs.msg import Point, Quaternion
 
 class CircularMovement(Node):
     """
-    Orchestrates a sequence of movements for the RM robot arm using MoveJ, MoveL,
-    and MoveC commands. Key motion parameters like height, speeds, and loop count
-    are configurable via ROS 2 parameters.
+    Orchestrates a sequence of movements for the RM robot arm. Key motion
+    parameters are configurable, with the circular motion defined by a
+    user-set radius around a fixed center point.
     """
 
     def __init__(self):
@@ -18,28 +18,33 @@ class CircularMovement(Node):
         """
         super().__init__('circular_movement_node')
 
+        # --- Define the fixed center point for the circle ---
+        self.center_x = 0.20
+        self.center_y = 0.0
+        self.get_logger().info(f"Using fixed circle center at (x={self.center_x}, y={self.center_y})")
+
         # --- Declare and retrieve all user-definable parameters ---
         self.get_logger().info("Declaring and retrieving parameters...")
         
-        # Declare height (float)
+        # Motion parameters
         self.declare_parameter('circular_height', 0.3, ParameterDescriptor(description='Z-height for the circular movement (meters).'))
-        self.circular_height = self.get_parameter('circular_height').get_parameter_value().double_value
-        
-        # Declare speeds (integers, as requested)
         self.declare_parameter('speed_joint', 15, ParameterDescriptor(description='Speed for joint-space moves (MoveJ), percentage (1-100).'))
         self.declare_parameter('speed_linear', 25, ParameterDescriptor(description='Speed for linear moves (MoveL), percentage (1-100).'))
         self.declare_parameter('speed_circular', 30, ParameterDescriptor(description='Speed for circular moves (MoveC), percentage (1-100).'))
-        
-        # Declare loop count (integer)
         self.declare_parameter('circular_loop', 1, ParameterDescriptor(description='Number of times to repeat the circular motion.'))
+        
+        # Simplified geometry parameter
+        self.declare_parameter('radius', 0.05, ParameterDescriptor(description='Radius of the circle to draw (meters).'))
 
-        # Retrieve integer parameters and store them
+        # Retrieve and store all parameter values
+        self.circular_height = self.get_parameter('circular_height').get_parameter_value().double_value
         self.speed_joint = self.get_parameter('speed_joint').get_parameter_value().integer_value
         self.speed_linear = self.get_parameter('speed_linear').get_parameter_value().integer_value
         self.speed_circular = self.get_parameter('speed_circular').get_parameter_value().integer_value
         self.circular_loop = self.get_parameter('circular_loop').get_parameter_value().integer_value
-        
-        self.get_logger().info(f"Parameters set: [Height: {self.circular_height}m], [Speeds (J/L/C): {self.speed_joint}/{self.speed_linear}/{self.speed_circular}%], [Loops: {self.circular_loop}]")
+        self.radius = self.get_parameter('radius').get_parameter_value().double_value
+
+        self.get_logger().info(f"Parameters loaded. Radius: {self.radius}m, Height: {self.circular_height}m")
 
         # --- Publisher Setup ---
         self.pub_movej = self.create_publisher(Movej, '/rm_driver/movej_cmd', 10)
@@ -66,32 +71,44 @@ class CircularMovement(Node):
         self.get_logger().info(f"Moving to start pose (MoveJ) at {self.speed_joint}% speed.")
         msg = Movej()
         msg.joint = [0.0, 0.0, 0.0, 1.57, 0.0, 1.57, 0.0]
-        msg.speed = int(self.speed_joint) # Use the parameter value
+        msg.speed = int(self.speed_joint)
         msg.block = True
         msg.dof = 7
         self.pub_movej.publish(msg)
 
     def _move_to_circle_start(self):
-        """STEP 3: Sends a MoveL command to the start of the circular arc."""
-        self.get_logger().info(f"Moving to circle start (MoveL) at {self.speed_linear}% speed.")
+        """STEP 3: Moves to the calculated start point of the circle (MoveL)."""
+        self.get_logger().info(f"Moving to calculated circle start (MoveL) at {self.speed_linear}% speed.")
         msg = Movel()
-        msg.pose.position = Point(x=0.25, y=0.0, z=self.circular_height)
+        
+        # Calculate the start point based on the fixed center and user-defined radius
+        start_x = self.center_x + self.radius
+        start_y = self.center_y
+        
+        msg.pose.position = Point(x=start_x, y=start_y, z=self.circular_height)
         msg.pose.orientation = Quaternion(x=0.0, y=1.0, z=0.0, w=0.0)
-        msg.speed = int(self.speed_linear) # Use the parameter value
+        msg.speed = int(self.speed_linear)
         msg.block = True
         self.pub_movel.publish(msg)
 
     def _perform_circular_move(self):
-        """STEP 4: Sends a MoveC command to execute the circular arc."""
-        self.get_logger().info(f"Performing circular move (MoveC) at {self.speed_circular}% speed for {self.circular_loop} loop(s).")
+        """STEP 4: Executes a semicircle arc based on the fixed center and user radius."""
+        self.get_logger().info(f"Performing circular move (MoveC) with radius {self.radius}m.")
         msg = Movec()
-        msg.pose_mid.position = Point(x=0.25, y=-0.05, z=self.circular_height)
-        msg.pose_mid.orientation = Quaternion(x=0.0, y=1.0, z=0.0, w=0.0)
-        msg.pose_end.position = Point(x=0.15, y=0.05, z=self.circular_height)
-        msg.pose_end.orientation = Quaternion(x=0.0, y=1.0, z=0.0, w=0.0)
-        msg.speed = int(self.speed_circular) # Use the parameter value
+        
+        # Calculate mid and end points based on the fixed center and user-defined radius
+        mid_point = Point(x=self.center_x, y=self.center_y - self.radius, z=self.circular_height)
+        end_point = Point(x=self.center_x - self.radius, y=self.center_y, z=self.circular_height)
+        orientation = Quaternion(x=0.0, y=1.0, z=0.0, w=0.0)
+
+        msg.pose_mid.position = mid_point
+        msg.pose_mid.orientation = orientation
+        msg.pose_end.position = end_point
+        msg.pose_end.orientation = orientation
+        
+        msg.speed = int(self.speed_circular)
         msg.block = True
-        msg.loop = self.circular_loop         # Use the parameter value
+        msg.loop = self.circular_loop
         self.pub_movec.publish(msg)
 
     def _stop_force_control(self):
@@ -128,3 +145,19 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
+
+'''
+#Example command
+# speed (1 - 100)
+# circular height (in meters) (0.25  - 0.40)
+# circular loop - (any integer > 0)
+# radius (in meters) (0 - 0.1) ( do not exceed for safety purpose and avoid collision)
+ros2 run my_ros_pkg circular  --ros-args \
+    -p circular_height:=0.1 \
+    -p speed_joint:=20 \
+    -p speed_linear:=30 \
+    -p speed_circular:=40 \
+    -p circular_loop:=3 \
+    -p radius:=0.1
+'''
