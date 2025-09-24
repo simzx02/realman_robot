@@ -144,9 +144,24 @@ loop: 0
 }"
 ```
 
+### Example Script
+```bash
+chmod +x src/launch_shell/circular.bash
+src/launch_shell/circular.bash
+```
+- This runs the driver, and allow user inputs for:
+```bash
+-----------------------------------------------------
+  Speeds (Joint/Linear/Circular): 20% / 30% / 40%
+  Circular Height:                0.3m
+  Circular Loops:                 3
+  Radius:                         0.03m
+-----------------------------------------------------
+```
+
 ## Notes
 
-- **Joint Order**: Note that the joint order in trajectory messages is: `["joint2", "joint3", "joint5", "joint6", "joint1", "joint4", "joint7"]`
+- **Joint Order**: Note that the joint order in trajectory messages.
 - **Coordinates**: Position units are in meters, orientation uses quaternions
 - **Speed**: Speed values are typically 1-100 (percentage)
 - **Block**: Set to `true` for blocking (wait for completion) or `false` for non-blocking
