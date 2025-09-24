@@ -14,7 +14,7 @@ git clone https://github.com/RealManRobot/ros2_rm_robot
 - **Default RealMan IP**: `http://192.168.1.18/`
 - Check your IP configuration (row 4 in the network settings)
 - **Critical**: Different IP addresses will cause connection failures
-- ![Alt text](yaml_config.png)
+![Alt text](yaml_config.png)
 
 ## 3. Launch RVIZ and Gazebo (Simulation)
 
@@ -56,7 +56,7 @@ time_from_start: {sec: 6, nanosec: 0}
 ]
 }'
 ```
-- ![Alt text](rviz.png)
+![Alt text](rviz.png)
 
 ## 4. Connect Physical Robot
 
@@ -155,5 +155,6 @@ loop: 0
 ## Troubleshooting
 
 1. **Connection Issues**: Verify IP address matches robot configuration
-2. **Movement Failures**: Check joint limits and workspace boundaries
+2. **Movement Failures**: Check joint limits and workspace boundaries (Usually happen when programmed using ai-generated code.)
 3. **Simulation vs Real**: Different topic names for simulation (`/rm_group_controller/`) vs real robot (`/rm_driver/`)
+4. **Different parameter matching**: ROS Topics use quartenion, while Python functions use Euler by default. You need to figure out and define your desire function to match both of them.
