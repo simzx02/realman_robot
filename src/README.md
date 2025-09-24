@@ -14,6 +14,7 @@ git clone https://github.com/RealManRobot/ros2_rm_robot
 - **Default RealMan IP**: `http://192.168.1.18/`
 - Check your IP configuration (row 4 in the network settings)
 - **Critical**: Different IP addresses will cause connection failures
+- ![Alt text](yaml_config.png)
 
 ## 3. Launch RVIZ and Gazebo (Simulation)
 
@@ -55,6 +56,7 @@ time_from_start: {sec: 6, nanosec: 0}
 ]
 }'
 ```
+- ![Alt text](rviz.png)
 
 ## 4. Connect Physical Robot
 
