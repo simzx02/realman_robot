@@ -19,8 +19,8 @@ class CircularMovement(Node):
         super().__init__('circular_movement_node')
 
         # --- Define the fixed center point for the circle ---
-        self.center_x = 0.20
-        self.center_y = 0.0
+        self.center_x = 0.00
+        self.center_y = -0.20
         self.get_logger().info(f"Using fixed circle center at (x={self.center_x}, y={self.center_y})")
 
         # --- Declare and retrieve all user-definable parameters ---
@@ -70,7 +70,7 @@ class CircularMovement(Node):
         """STEP 2: Sends a MoveJ command to a predefined joint configuration."""
         self.get_logger().info(f"Moving to start pose (MoveJ) at {self.speed_joint}% speed.")
         msg = Movej()
-        msg.joint = [0.0, 0.0, 0.0, 1.57, 0.0, 1.57, 0.0]
+        msg.joint = [-1.57, 0.0, 0.0, 1.57, 0.0, 1.57, -1.57]
         msg.speed = int(self.speed_joint)
         msg.block = True
         msg.dof = 7
@@ -86,7 +86,7 @@ class CircularMovement(Node):
         start_y = self.center_y
         
         msg.pose.position = Point(x=start_x, y=start_y, z=self.circular_height)
-        msg.pose.orientation = Quaternion(x=0.0, y=1.0, z=0.0, w=0.0)
+        msg.pose.orientation = Quaternion(x=0.707, y=0.707, z=0.0, w=0.0)
         msg.speed = int(self.speed_linear)
         msg.block = True
         self.pub_movel.publish(msg)
@@ -99,7 +99,7 @@ class CircularMovement(Node):
         # Calculate mid and end points based on the fixed center and user-defined radius
         mid_point = Point(x=self.center_x, y=self.center_y - self.radius, z=self.circular_height)
         end_point = Point(x=self.center_x - self.radius, y=self.center_y, z=self.circular_height)
-        orientation = Quaternion(x=0.0, y=1.0, z=0.0, w=0.0)
+        orientation = Quaternion(x=0.707, y=0.707, z=0.0, w=0.0)
 
         msg.pose_mid.position = mid_point
         msg.pose_mid.orientation = orientation

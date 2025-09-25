@@ -140,8 +140,8 @@ tmux new-session -d -s $TMUX_SESSION -n "Driver"
 # Send the driver launch command to the first window
 tmux send-keys -t $TMUX_SESSION:Driver "echo 'Launching RM-75 Driver...'; ros2 launch rm_driver rm_75_driver.launch.py" C-m
 
-echo "Waiting 5 seconds for the driver to initialize..."
-sleep 5
+echo "Waiting 2 seconds for the driver to initialize..."
+sleep 2
 
 # Create a new window for the motion control script
 tmux new-window -t $TMUX_SESSION -n "Motion"
